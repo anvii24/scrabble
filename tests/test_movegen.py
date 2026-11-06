@@ -1,78 +1,97 @@
-from __future__ import annotations
+import os
+import time
 
-import pytest
+from scrabble.constants import LETTER_POINTS, SIZE
+from scrabble.movegen import brute_force_moves, generate_moves
+from scrabble.types import Tile
 
-
-@pytest.mark.skip(reason="TODO")
-def test_anchors_empty_board_is_centre():
-    pass
-
-
-@pytest.mark.skip(reason="TODO")
-def test_anchors_surround_tiles():
-    pass
+WORDS = ["AT", "TA", "CAT", "ACT", "TAC", "AS", "SAT", "CATS", "ACTS", "SCAT", "TO", "OAT",
+         "COAT", "COATS", "TACO", "TACOS", "OF", "FA", "OX", "AX", "TAX", "DOG", "GOD",
+         "GO", "DO", "OD", "AD", "ADS"]
 
 
-@pytest.mark.skip(reason="TODO")
-def test_cross_checks_empty_board():
-    pass
+class FakeBoard:
+    def __init__(self):
+        self.grid = [[None] * SIZE for _ in range(SIZE)]
+
+    def get(self, row, col):
+        return self.grid[row][col]
+
+    def put(self, row, col, word, across=True):
+        for letter in word:
+            self.grid[row][col] = Tile(letter, LETTER_POINTS[letter])
+            if across:
+                col += 1
+            else:
+                row += 1
 
 
-@pytest.mark.skip(reason="TODO")
-def test_cross_checks_limit_letters():
-    pass
+class FakeLexicon:
+    def __init__(self, words):
+        self.root = {}
+        for word in words:
+            node = self.root
+            for letter in word:
+                node = node.setdefault(letter, {})
+            node["$"] = True
 
 
-@pytest.mark.skip(reason="TODO")
-def test_cross_checks_empty_set_when_nothing_fits():
-    pass
+def make_rack(letters):
+    return [Tile("?", 0, True) if l == "?" else Tile(l, LETTER_POINTS[l]) for l in letters]
 
 
-@pytest.mark.skip(reason="TODO")
-def test_first_move_covers_centre():
-    pass
+def keys(moves):
+    return {tuple(sorted((p.row, p.col, p.tile.letter, p.tile.is_blank) for p in m.placements)) for m in moves}
 
 
-@pytest.mark.skip(reason="TODO")
-def test_all_moves_pass_validate():
-    pass
+def check_same(board, letters):
+    lexicon = FakeLexicon(WORDS)
+    rack = make_rack(letters)
+    fast = keys(generate_moves(board, rack, lexicon))
+    slow = keys(brute_force_moves(board, rack, lexicon))
+    assert fast == slow
+    return fast
 
 
-@pytest.mark.skip(reason="TODO")
-def test_all_moves_scored():
-    pass
+def test_empty_board():
+    moves = check_same(FakeBoard(), "CATS")
+    assert len(moves) > 0
 
 
-@pytest.mark.skip(reason="TODO")
-def test_down_plays_are_found():
-    pass
+def test_one_word_on_board():
+    board = FakeBoard()
+    board.put(7, 6, "CAT")
+    check_same(board, "OSD")
 
 
-@pytest.mark.skip(reason="TODO")
-def test_blanks_produce_moves():
-    pass
+def test_word_going_down():
+    board = FakeBoard()
+    board.put(5, 7, "DOG", across=False)
+    check_same(board, "ATS")
 
 
-@pytest.mark.skip(reason="TODO")
-def test_no_duplicate_moves():
-    pass
+def test_two_words():
+    board = FakeBoard()
+    board.put(7, 5, "COAT")
+    board.put(5, 8, "TAX", across=False)
+    check_same(board, "ASO")
 
 
-@pytest.mark.skip(reason="TODO")
-def test_matches_brute_force():
-    pass
+def test_blank():
+    board = FakeBoard()
+    board.put(7, 7, "AT")
+    check_same(board, "?S")
 
 
-@pytest.mark.skip(reason="TODO")
-def test_output_order_is_deterministic():
-    pass
-
-
-@pytest.mark.skip(reason="TODO")
-def test_inputs_not_mutated():
-    pass
-
-
-@pytest.mark.skip(reason="TODO")
-def test_empty_rack_gives_no_moves():
-    pass
+def test_speed_with_real_words():
+    path = os.path.join("data", "enable1.txt")
+    if not os.path.exists(path):
+        return
+    with open(path) as f:
+        words = [w.strip().upper() for w in f if 2 <= len(w.strip()) <= 15]
+    lexicon = FakeLexicon(words)
+    board = FakeBoard()
+    board.put(7, 5, "SCRABBLE")
+    start = time.time()
+    generate_moves(board, make_rack("AEINRST"), lexicon)
+    assert time.time() - start < 1
