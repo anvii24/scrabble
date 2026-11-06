@@ -1,8 +1,10 @@
+
 from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
 from scrabble.types import Tile
+from scrabble.constants import RACK_SIZE
 
 if TYPE_CHECKING:
     from scrabble.bag import TileBag
@@ -10,19 +12,36 @@ if TYPE_CHECKING:
 
 class Rack:
     def __init__(self, tiles: list[Tile] | None = None) -> None:
-        raise NotImplementedError
+        if tiles is None:
+            self.tiles = []
+        else:
+            self.tiles = tiles.copy()
 
     def add(self, tiles: list[Tile]) -> None:
-        raise NotImplementedError
+        self.tiles.extend(tiles)
 
     def remove(self, tiles: list[Tile]) -> None:
-        raise NotImplementedError
+        for tile in tiles:
+            if tile not in self.tiles:
+                raise ValueError("Tile is not present in the rack")
+
+        for tile in tiles:
+            self.tiles.remove(tile)
 
     def refill(self, bag: TileBag) -> None:
-        raise NotImplementedError
+        needed = RACK_SIZE - len(self.tiles)
+
+        if needed > 0:
+            new_tiles = bag.draw(needed)
+            self.add(new_tiles)
 
     def letters(self) -> str:
-        raise NotImplementedError
+        return "".join(tile.letter for tile in self.tiles)
 
     def value(self) -> int:
-        raise NotImplementedError
+        total = 0
+
+        for tile in self.tiles:
+            total += tile.points
+
+        return total
