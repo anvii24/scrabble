@@ -1,6 +1,6 @@
-# Scrabble AI
+# Scrabble
 
-A university AI course project: a two-player Scrabble game whose AI picks moves
+A two-player Scrabble game whose AI picks moves
 with a weighted evaluation function. The weights are tuned by four techniques
 (hill climbing, tabu search, simulated annealing and a genetic algorithm), and
 the tuned players are compared against a greedy baseline that always takes the
@@ -67,20 +67,3 @@ Each module's docstring names the step it belongs to.
 | 6 | Game loop and UI | `scrabble/game.py`, `ui.py`, `main.py` |
 | 7 | Optimisation | `optimise/common.py`, `fitness.py`, `hill_climb.py`, `tabu.py`, `annealing.py`, `genetic.py` |
 | 8 | Experiments | `experiments/run_all.py`, `plots.py` |
-
-## Team & files
-
-| Owner | Files |
-| --- | --- |
-|  | `scrabble/types.py`, `scrabble/constants.py` |
-|  | `scrabble/board.py`, `scrabble/bag.py`, `scrabble/rack.py` |
-|  | `scrabble/rules.py`, `scrabble/scoring.py` |
-|  | `scrabble/lexicon.py`, `scrabble/movegen.py` |
-|  | `scrabble/players.py`, `scrabble/evaluation.py` |
-|  | `scrabble/game.py`, `scrabble/ui.py`, `main.py` |
-|  | `optimise/common.py`, `optimise/fitness.py` |
-|  | `optimise/hill_climb.py` |
-|  | `optimise/tabu.py` |
-|  | `optimise/annealing.py` |
-|  | `optimise/genetic.py` |
-|  | `experiments/run_all.py`, `experiments/plots.py` |
