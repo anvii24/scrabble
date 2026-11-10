@@ -9,7 +9,6 @@ from optimise.common import Result, neighbour, random_weights
 
 
 def _move_of(old: list[float], new: list[float]) -> tuple[int, int]:
-    """(weight index, direction +1/-1) of the single weight neighbour() changed."""
     for i, (a, b) in enumerate(zip(old, new)):
         if a != b:
             return i, (1 if b > a else -1)
@@ -41,7 +40,7 @@ def run(
     evaluate(current)
 
     while fit.CALLS < budget:
-        candidates = []  # (fitness, weights, move, is_tabu)
+        candidates = []  
         for _ in range(n_neighbours):
             if fit.CALLS >= budget:
                 break
