@@ -1,20 +1,3 @@
-"""Step 7: shared fitness function.
-
-NOTE (integration fix, not part of tasks 11/13): this module was still an
-unimplemented stub (`raise NotImplementedError`) and its `LEXICON_PATH`
-pointed at `data/words.txt`, a file that does not exist anywhere in the
-repository -- the actual word list that ships with the project is
-`data/enable1.txt` (see `tests/test_movegen.py`). Every optimisation
-technique, including simulated annealing (task 11), calls `fitness()`, so
-the project could not run end to end without this module working. Per the
-brief's instruction to propose the smallest necessary fix for another
-module rather than silently redesigning it, this is a minimal, literal
-implementation of the documented interface: play `n_games` games of the
-candidate `WeightedPlayer` against a `GreedyPlayer`, alternating who moves
-first, and return the average margin. This should be reviewed by whoever
-owns `optimise/fitness.py`.
-"""
-
 from __future__ import annotations
 
 from pathlib import Path
@@ -58,18 +41,17 @@ def fitness(weights: list[float], n_games: int = 6, seed: int = 0) -> float:
     """Score a weight vector by playing it against the greedy baseline.
 
     Plays `n_games` complete games of a `WeightedPlayer` using `weights`
-    against a `GreedyPlayer`, alternating which of the two moves first, and
-    returns the average margin (the weighted player's final score minus
-    the greedy player's) across those games. A positive value means the
-    weighted player outperformed greedy on average.
+    against a `GreedyPlayer` and returns the average margin (the weighted
+    player's final score minus the greedy player's). A positive value
+    means the weighted player outperformed greedy on average.
 
     Args:
         weights: the six evaluation weights to test.
-        n_games: how many games to play. Must be at least 1.
-        seed: base seed. Game ``i`` (0-indexed) is dealt with
-            `scrabble.game.new_game`'s seed set to ``seed + i``, so calling
-            `fitness` again with the same `weights`, `n_games` and `seed`
-            reproduces exactly the same games.
+        n_games: how many games to play. Must be at least 1. Use an even
+            number so every seed is played from both seats.
+        seed: base seed. Game ``i`` (0-indexed) uses seed ``seed + i // 2``,
+            so each seed is played twice with the seats swapped and the
+            luck of the tiles cancels out.
 
     Returns:
         The average score margin across the `n_games` games.
@@ -89,7 +71,7 @@ def fitness(weights: list[float], n_games: int = 6, seed: int = 0) -> float:
     total_margin = 0.0
 
     for i in range(n_games):
-        game_seed = seed + i
+        game_seed = seed + i // 2
         tuned_moves_first = i % 2 == 0
 
         if tuned_moves_first:

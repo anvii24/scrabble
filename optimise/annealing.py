@@ -1,13 +1,3 @@
-"""Step 7: simulated annealing.
-
-Tunes the six evaluation weights by simulated annealing: a single random
-walk through weight-space (via `optimise.common.neighbour`) that always
-accepts an improving move and sometimes accepts a worsening one, with the
-chance of accepting a worsening move falling as the "temperature" cools.
-That occasional willingness to accept a worse solution is what lets the
-search escape local optima that pure hill climbing would get stuck in.
-"""
-
 from __future__ import annotations
 
 import math
