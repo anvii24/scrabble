@@ -37,7 +37,7 @@ def _get_lexicon() -> Lexicon:
     return _lexicon_cache
 
 
-def fitness(weights: list[float], n_games: int = 6, seed: int = 0) -> float:
+def fitness(weights: list[float], n_games: int = 4, seed: int = 0) -> float:
     """Score a weight vector by playing it against the greedy baseline.
 
     Plays `n_games` complete games of a `WeightedPlayer` using `weights`
