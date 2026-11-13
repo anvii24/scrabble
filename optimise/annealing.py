@@ -4,12 +4,12 @@ import math
 import random
 import time
 
-from optimise.common import Result, neighbour, random_weights
+from optimise.common import Result, neighbour
+
 
 def run(
     budget: int = 100, seed: int = 0, T0: float = 10.0, alpha: float = 0.97
-)
-    
+) -> Result:
     from optimise import fitness as fitness_module
 
     start = time.time()
@@ -42,12 +42,12 @@ def run(
         history.append(best_fitness)
         return value
 
-    current = [1.0, 0.0, 0.0, 0.0, 0.0, 0.0]
-    current_fitness = evaluate(current)
+    current_weights = [1.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+    current_fitness = evaluate(current_weights)
     temperature = T0
 
     while calls_made < budget:
-        candidate_weights = neighbour(current, rng)
+        candidate_weights = neighbour(current_weights, rng)
         candidate_fitness = evaluate(candidate_weights)
 
         delta = candidate_fitness - current_fitness
