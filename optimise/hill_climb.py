@@ -26,7 +26,10 @@ def run(budget: int = 100, seed: int = 0, n_neighbours: int = 10) -> Result:
         return value
 
     while fit.CALLS < budget:
-        current = random_weights(rng)
+        if restarts == 0:
+            current = [1.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+        else:
+            current = random_weights(rng)
         current_fit = evaluate(current)
 
         while fit.CALLS < budget:
