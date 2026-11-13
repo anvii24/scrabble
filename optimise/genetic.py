@@ -63,7 +63,7 @@ def run(budget=100, seed=0, pop_size=10, tour_k=3, p_cross=0.8, p_mut=0.1, elite
     rng = random.Random(seed)
     start = time.time()
     evaluator = Evaluator(fitness_fn, budget)
-    population = [random_weights(rng) for _ in range(pop_size)]
+    population = [[1.0, 0.0, 0.0, 0.0, 0.0, 0.0]] + [random_weights(rng) for _ in range(pop_size - 1)]
     best_per_gen = []
     avg_per_gen = []
     while not evaluator.done():

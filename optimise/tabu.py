@@ -36,7 +36,7 @@ def run(
         history.append(best_fitness)
         return value
 
-    current = random_weights(rng)
+    current = [1.0, 0.0, 0.0, 0.0, 0.0, 0.0]
     evaluate(current)
 
     while fit.CALLS < budget:
