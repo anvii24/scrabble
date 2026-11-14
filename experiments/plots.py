@@ -139,7 +139,7 @@ def write_results_table(results_dir: Path = RESULTS_DIR) -> Path:
     lines.append("")
     lines.append("Values are mean ± std over seeds.")
     out = Path(results_dir) / "results_table.md"
-    out.write_text("\n".join(lines) + "\n")
+    out.write_text("\n".join(lines) + "\n", encoding="utf-8")
     return out
 
 
