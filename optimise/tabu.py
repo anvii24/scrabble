@@ -5,7 +5,7 @@ import time
 from collections import deque
 
 from optimise import fitness as fit
-from optimise.common import Result, neighbour, random_weights
+from optimise.common import Result, neighbour
 
 
 def _move_of(old: list[float], new: list[float]) -> tuple[int, int]:

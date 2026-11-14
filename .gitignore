@@ -21,8 +21,3 @@ env/
 .vscode/
 .DS_Store
 Thumbs.db
-
-# Experiment outputs
-experiments/results/*.csv
-experiments/results/*.png
-experiments/results/*.pkl

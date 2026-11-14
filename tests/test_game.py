@@ -24,7 +24,6 @@ def test_new_game_deals_full_racks():
     assert state.scores == [0, 0]
     assert state.turn == 0
     assert state.passes == 0
-    # 100 tiles total, 7 drawn per rack.
     assert state.bag.remaining() == 100 - 2 * RACK_SIZE
 
 
@@ -43,8 +42,6 @@ def test_new_game_too_few_players_raises():
 def test_apply_play_updates_everything():
     state = new_game(seed=1, n_players=2)
     rack = state.racks[0]
-    # Build a move entirely out of tiles actually on the rack, placed
-    # through the centre square (board starts empty).
     tile = rack.tiles[0]
     move = Move(
         kind="play",
@@ -59,7 +56,7 @@ def test_apply_play_updates_everything():
 
     assert state.board.get(7, 7) == tile
     assert tile not in state.racks[0].tiles
-    assert len(state.racks[0].tiles) == rack_before  # refilled back to 7
+    assert len(state.racks[0].tiles) == rack_before
     assert state.bag.remaining() == bag_before - 1
     assert state.scores[0] == move.score
     assert state.passes == 0
@@ -71,12 +68,10 @@ def test_apply_play_handles_blank_tiles():
     rack = state.racks[0]
     blank = next((t for t in rack.tiles if t.is_blank), None)
     if blank is None:
-        # Force a blank onto the rack for this seed so the test is robust
-        # regardless of what was dealt.
         blank = Tile("?", 0, True)
         rack.tiles[0] = blank
 
-    played_as = Tile("Z", 0, True)  # blank re-lettered the way movegen does it
+    played_as = Tile("Z", 0, True)
     move = Move(kind="play", placements=[Placement(7, 7, played_as)], score=0, words=["Z"])
 
     apply_move(state, move)
@@ -96,11 +91,6 @@ def test_apply_exchange_counts_as_pass():
 
     assert state.passes == 1
     assert len(state.racks[0].tiles) == RACK_SIZE
-    # The bag's total size is unchanged (two tiles drawn out, two returned),
-    # and the exchanged tiles are now physically back in the bag's pool.
-    # (We don't assert the exchanged tiles are absent from the rack: a
-    # freshly-drawn replacement can coincidentally share a letter with one
-    # of them, since `Tile` equality is by value, not identity.)
     assert state.bag.remaining() == bag_before
     for tile in exchanged:
         assert tile in state.bag.tiles
@@ -108,7 +98,6 @@ def test_apply_exchange_counts_as_pass():
 
 def test_apply_exchange_with_low_bag_raises():
     state = new_game(seed=3, n_players=2)
-    # Drain the bag down to fewer tiles than the rack holds.
     state.bag.draw(state.bag.remaining() - 1)
     move = Move(kind="exchange", exchanged=state.racks[0].tiles[:2])
 
@@ -171,9 +160,6 @@ def test_play_game_applies_end_game_adjust(lexicon):
     p1 = GreedyPlayer(lexicon, "G1")
     p2 = GreedyPlayer(lexicon, "G2")
     result = play_game(p1, p2, seed=0, lexicon=lexicon)
-    # The final scores reflect the end-of-game rack adjustment, so they
-    # need not match a simple running total; just sanity-check they are
-    # plausible integers.
     assert all(isinstance(s, int) for s in result["scores"])
 
 
@@ -190,9 +176,6 @@ def test_play_game_rejects_illegal_move(lexicon):
         name = "Cheat"
 
         def choose_move(self, state, rack):
-            # Claim to play a word through squares that are not connected
-            # to anything and do not cover the centre -- illegal as a
-            # first move.
             tile = rack.tiles[0]
             return Move(kind="play", placements=[Placement(0, 0, tile)], score=0, words=[])
 

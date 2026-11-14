@@ -1,14 +1,3 @@
-"""Step 6: terminal UI.
-
-A minimal text interface for a human to play against an AI: rendering the
-board and the human's own rack (`show`), reading a line of text into a
-`Move` (`parse_move`), and a `Player` that drives both of those (`HumanPlayer`).
-
-Board squares are addressed the way `parse_move` expects them to be typed:
-a row letter from "A" to "O" (top to bottom) followed by a 1-indexed column
-number from 1 to 15 (left to right), e.g. the centre square is "H8".
-"""
-
 from __future__ import annotations
 
 from typing import TYPE_CHECKING
@@ -23,7 +12,7 @@ if TYPE_CHECKING:
     from scrabble.lexicon import Lexicon
     from scrabble.rack import Rack
 
-ROW_LETTERS = "ABCDEFGHIJKLMNO"  # SIZE (15) rows, A..O
+ROW_LETTERS = "ABCDEFGHIJKLMNO"
 DIRECTIONS = {"across": (0, 1), "down": (1, 0)}
 
 
@@ -32,15 +21,6 @@ def _row_label(row: int) -> str:
 
 
 def show(state: GameState, player_idx: int) -> None:
-    """Print the board, the given player's own rack, scores and bag count.
-
-    Only `player_idx`'s rack is shown -- an opponent's tiles stay hidden,
-    the way they would at a real table.
-
-    Args:
-        state: the game state to display.
-        player_idx: which player's rack to reveal.
-    """
     lines = []
 
     header = "    " + "".join(f"{c + 1:>3}" for c in range(SIZE))
@@ -76,7 +56,6 @@ def show(state: GameState, player_idx: int) -> None:
 
 
 def _parse_coordinate(token: str) -> tuple[int, int]:
-    """Parse a square like "H8" into a 0-indexed (row, col) pair."""
     if len(token) < 2:
         raise ValueError(f"Malformed coordinate: {token!r}")
 
@@ -96,7 +75,6 @@ def _parse_coordinate(token: str) -> tuple[int, int]:
 
 
 def _take_rack_tile(available: list[Tile], letter: str, want_blank: bool) -> Tile:
-    """Remove and return a matching tile from `available` (mutated in place)."""
     if want_blank:
         match = next((t for t in available if t.is_blank), None)
     else:
@@ -111,35 +89,6 @@ def _take_rack_tile(available: list[Tile], letter: str, want_blank: bool) -> Til
 
 
 def parse_move(text: str, board: Board, rack: Rack) -> Move:
-    """Parse one line of player input into a `Move`.
-
-    Recognised forms (case-insensitive, whitespace-separated):
-
-    * ``pass`` -- a pass.
-    * ``exchange <letters>`` -- an exchange, e.g. ``exchange AEI``.
-    * ``<coord> <across|down> <word>`` -- a play, e.g. ``H8 across QUIZ``.
-      A lowercase letter in `word` stands for a blank tile played as that
-      letter, e.g. the lowercase ``z`` in ``H8 across QUIz`` is a blank
-      standing in for Z. Any square in `word`'s path that already holds a
-      tile is skipped rather than re-placed, as long as the existing
-      letter matches what `word` expects there.
-
-    Args:
-        text: the raw line of input.
-        board: the current board, used to resolve squares that already
-            hold a tile.
-        rack: the current player's rack. Tiles the move would need are
-            checked against it, but it is not mutated.
-
-    Returns:
-        The parsed `Move`. For a "play" move, `score` and `words` are left
-        at their defaults (0 and ``[]``); `HumanPlayer` fills those in once
-        the move has been validated.
-
-    Raises:
-        ValueError: if `text` does not match any recognised form, or
-            refers to tiles the rack does not hold.
-    """
     tokens = text.strip().split()
 
     if not tokens:
@@ -167,7 +116,6 @@ def parse_move(text: str, board: Board, rack: Rack) -> Move:
         ]
         return Move(kind="exchange", exchanged=exchanged)
 
-    # Otherwise this should be a play: "<coord> <across|down> <word>".
     if len(tokens) != 3:
         raise ValueError(
             "Usage: <coord> <across|down> <word>, 'exchange <letters>' or 'pass'"
@@ -203,7 +151,7 @@ def parse_move(text: str, board: Board, rack: Rack) -> Move:
                 raise ValueError(
                     f"{coord_token} already holds {existing.letter!r}, not {letter!r}"
                 )
-            continue  # Reuses a tile already on the board; no rack tile spent.
+            continue
 
         tile = _take_rack_tile(available, letter, is_blank)
         tile = Tile(letter, tile.points, is_blank) if is_blank else tile
@@ -216,20 +164,11 @@ def parse_move(text: str, board: Board, rack: Rack) -> Move:
 
 
 class HumanPlayer(Player):
-    """A `Player` whose moves come from reading lines of terminal input."""
-
     def __init__(self, lexicon: Lexicon, name: str = "Human") -> None:
         self.lexicon = lexicon
         self.name = name
 
     def choose_move(self, state: GameState, rack: Rack) -> Move:
-        """Show the board, prompt for a move, and keep asking until it is valid.
-
-        Invalid input (malformed text, or a move that fails
-        `scrabble.rules.validate`) never crashes the game or propagates as
-        an exception: it is reported to the player and they are
-        re-prompted.
-        """
         player_idx = state.racks.index(rack)
         show(state, player_idx)
 

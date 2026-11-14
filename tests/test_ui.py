@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-import io
-
 import pytest
 
 from scrabble.board import Board
@@ -9,7 +7,7 @@ from scrabble.game import new_game
 from scrabble.lexicon import Lexicon
 from scrabble.rack import Rack
 from scrabble.rules import validate
-from scrabble.types import Move, Placement, Tile
+from scrabble.types import Placement, Tile
 from scrabble.ui import HumanPlayer, parse_move, show
 
 
@@ -84,8 +82,6 @@ def test_parse_skips_tiles_on_board():
     board.place([Placement(7, 7, Tile("Q", 10, False))])
     rack = _rack("UIZ")
     move = parse_move("H8 across QUIZ", board, rack)
-    # The Q square already holds a Q, so no placement should be generated
-    # for it, and no Q tile should have been required from the rack.
     assert (7, 7) not in {(p.row, p.col) for p in move.placements}
     assert len(move.placements) == 3
 

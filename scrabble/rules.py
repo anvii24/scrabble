@@ -1,10 +1,8 @@
-
 from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
 from scrabble.types import Move, Placement, Tile
-from scrabble.constants import CENTER
 from scrabble.constants import CENTER, SIZE
 
 if TYPE_CHECKING:
@@ -15,7 +13,6 @@ if TYPE_CHECKING:
 def words_formed(
     board: Board, placements: list[Placement]
 ) -> list[list[tuple[int, int, Tile]]]:
-
     if not placements:
         return []
 
@@ -31,7 +28,6 @@ def words_formed(
         return board.get(r, c)
 
     def get_word(r, c, dr, dc):
-
         while 0 <= r - dr < SIZE and 0 <= c - dc < SIZE:
             if get_tile(r - dr, c - dc) is None:
                 break
@@ -84,8 +80,6 @@ def words_formed(
 
 
 def validate(board: Board, move: Move, lexicon: Lexicon) -> tuple[bool, str]:
-
-    # Pass and exchange moves are valid
     if move.kind in ("pass", "exchange"):
         return True, "Valid move"
 
@@ -97,12 +91,10 @@ def validate(board: Board, move: Move, lexicon: Lexicon) -> tuple[bool, str]:
     if not placements:
         return False, "No tiles placed"
 
-    # Check that all positions are inside the board
     for p in placements:
         if not board.in_bounds(p.row, p.col):
             return False, "Tile is outside the board"
 
-    # Check for duplicate or already occupied positions
     positions = set()
 
     for p in placements:
@@ -116,20 +108,17 @@ def validate(board: Board, move: Move, lexicon: Lexicon) -> tuple[bool, str]:
         if not board.is_empty_square(p.row, p.col):
             return False, "Square is already occupied"
 
-    # Check that all tiles are in the same row or column
     same_row = all(p.row == placements[0].row for p in placements)
     same_col = all(p.col == placements[0].col for p in placements)
 
     if not same_row and not same_col:
         return False, "Tiles must be placed in one line"
 
-    # Create a temporary board to check gaps and connections
     new_board = board.copy()
 
     for p in placements:
         new_board.place([p])
 
-    # Check whether there are gaps between the placed tiles
     if same_row:
         row = placements[0].row
         start = min(p.col for p in placements)
@@ -148,7 +137,6 @@ def validate(board: Board, move: Move, lexicon: Lexicon) -> tuple[bool, str]:
             if new_board.get(r, col) is None:
                 return False, "There is a gap between tiles"
 
-    # First move must cover the centre square
     if board.is_empty():
         if len(placements) < 2:
             return False, "First move must form a word"
@@ -157,7 +145,6 @@ def validate(board: Board, move: Move, lexicon: Lexicon) -> tuple[bool, str]:
             return False, "First move must cover the centre square"
 
     else:
-        # At least one new tile must touch an existing tile
         connected = False
 
         for p in placements:
@@ -175,13 +162,11 @@ def validate(board: Board, move: Move, lexicon: Lexicon) -> tuple[bool, str]:
         if not connected:
             return False, "Move is not connected to existing tiles"
 
-    # Find all words created by this move
     words = words_formed(board, placements)
 
     if not words:
         return False, "Move does not form a word"
 
-    # Check every word against the lexicon
     for word in words:
         word_string = "".join(tile.letter for r, c, tile in word)
 

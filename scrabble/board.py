@@ -1,4 +1,3 @@
-
 from __future__ import annotations
 
 from scrabble.types import Placement, Tile
@@ -45,15 +44,6 @@ class Board:
         for r in range(SIZE):
             for c in range(SIZE):
                 new_board.grid[r][c] = self.grid[r][c]
-
-        return new_board
-
-    def transpose(self) -> Board:
-        new_board = Board()
-
-        for r in range(SIZE):
-            for c in range(SIZE):
-                new_board.grid[c][r] = self.grid[r][c]
 
         return new_board
 
