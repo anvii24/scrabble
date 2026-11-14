@@ -1,9 +1,7 @@
-
 from __future__ import annotations
 
 
 class Lexicon:
-
     def __init__(self) -> None:
         self.root = {}
 
@@ -38,17 +36,6 @@ class Lexicon:
                 return False
 
         return "$" in node
-
-    def has_prefix(self, s: str) -> bool:
-        node = self.root
-
-        for letter in s.upper():
-            node = self.child(node, letter)
-
-            if node is None:
-                return False
-
-        return any(key != "$" for key in node) or "$" in node
 
     def child(self, node: dict, letter: str) -> dict | None:
         if letter == "$":

@@ -1,4 +1,3 @@
-
 from __future__ import annotations
 
 from typing import TYPE_CHECKING
@@ -25,7 +24,6 @@ def features(state: GameState, move: Move, rack: Rack) -> list[float]:
 
     letters = [tile.letter for tile in remaining if not tile.is_blank]
     vowel_count = sum(letter in VOWELS for letter in letters)
-    consonant_count = len(letters) - vowel_count
 
     if not letters:
         vowel_balance = 0.0

@@ -1,11 +1,3 @@
-"""Step 6: command-line entry point.
-
-Lets a human play a complete game against either the greedy baseline AI or
-a weighted AI, right in the terminal. Run it from the project root with:
-
-    python main.py
-"""
-
 from __future__ import annotations
 
 import random
@@ -27,14 +19,10 @@ if TYPE_CHECKING:
 
 WORD_LIST_PATH = Path(__file__).resolve().parent / "data" / "enable1.txt"
 
-# A reasonable, generic starting point if the player does not supply their
-# own tuned weights: value raw score, penalise a heavy rack leave, prefer a
-# balanced rack, and avoid opening premium squares for the opponent.
-DEFAULT_WEIGHTS = [1.0, -1.0, 1.0, -1.0, -1.0, 0.0]
+DEFAULT_WEIGHTS = [1.0, 0.0, 0.4713, -0.2761, 0.3178, 1.0254]
 
 
 def _load_weights(path_text: str) -> list[float]:
-    """Load six whitespace- or comma-separated weights from a text file."""
     text = Path(path_text).read_text(encoding="utf-8")
     parts = text.replace(",", " ").split()
     weights = [float(p) for p in parts]
@@ -46,13 +34,6 @@ def _load_weights(path_text: str) -> list[float]:
 
 
 def choose_opponent(lexicon: Lexicon) -> Player:
-    """Ask the player which AI to play against, and build it.
-
-    Re-prompts on anything other than "1" or "2". Choosing the weighted AI
-    ("2") asks for an optional path to a weights file; a blank answer, a
-    missing file, or a file that doesn't contain exactly six numbers all
-    fall back to `DEFAULT_WEIGHTS` rather than crashing the program.
-    """
     while True:
         print("Choose your opponent:")
         print("  1. Greedy AI")
@@ -82,7 +63,6 @@ def choose_opponent(lexicon: Lexicon) -> Player:
 
 
 def _play(human: Player, ai: Player, lexicon: Lexicon) -> None:
-    """Run one complete human-vs-AI game, printing progress as it goes."""
     seed = random.randint(0, 2**31 - 1)
     state = new_game(seed, n_players=2)
     players = [human, ai]
@@ -96,11 +76,6 @@ def _play(human: Player, ai: Player, lexicon: Lexicon) -> None:
         ok, reason = validate(state.board, move, lexicon)
 
         if not ok:
-            # Every Player implementation in this project only offers
-            # validated moves (HumanPlayer re-prompts until one passes
-            # validate(); the AI players only ever propose moves straight
-            # out of the move generator). This is a last-resort guard so a
-            # misbehaving Player cannot crash someone else's terminal game.
             print(f"{current.name} offered an illegal move ({reason}); passing instead.")
             move = Move(kind="pass")
 
@@ -134,7 +109,6 @@ def _play(human: Player, ai: Player, lexicon: Lexicon) -> None:
 
 
 def main() -> None:
-    """Entry point: load the word list, pick an opponent, and play."""
     if not WORD_LIST_PATH.exists():
         print(f"Word list not found at {WORD_LIST_PATH}. Cannot start a game.")
         sys.exit(1)
