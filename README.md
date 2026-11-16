@@ -8,8 +8,8 @@
 | Antara Shyam | 2410110518 |
 | Tanisha Agrawal | 2410110354 |
 | Pranav Gupta | 2410110241|
-| Vishnu Sriram | ________ |
-| Saksham Dhawan | ________ |
+| Vishnu Sriram | 2410110629 |
+| Saksham Dhawan | 2410110292 |
 
 A two-player Scrabble game in Python. The AI picks its move with a weighted
 evaluation function over six features (move score, rack leave, vowel balance,
