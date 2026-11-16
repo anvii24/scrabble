@@ -15,13 +15,10 @@ if TYPE_CHECKING:
 SCORELESS_TURN_LIMIT = 6
 
 
-def new_game(seed: int, n_players: int = 2) -> GameState:
-    if n_players < 2:
-        raise ValueError("A game needs at least two players")
-
+def new_game(seed: int) -> GameState:
     board = Board()
     bag = TileBag(seed)
-    racks = [Rack() for _ in range(n_players)]
+    racks = [Rack(), Rack()]
 
     for rack in racks:
         rack.refill(bag)
@@ -30,7 +27,7 @@ def new_game(seed: int, n_players: int = 2) -> GameState:
         board=board,
         bag=bag,
         racks=racks,
-        scores=[0 for _ in range(n_players)],
+        scores=[0, 0],
         turn=0,
         passes=0,
     )
@@ -126,7 +123,7 @@ def _who_went_out(state: GameState) -> int | None:
 
 def play_game(p1: Player, p2: Player, seed: int, lexicon: Lexicon) -> dict:
     players = [p1, p2]
-    state = new_game(seed, n_players=2)
+    state = new_game(seed)
     turns = 0
 
     while not is_over(state):

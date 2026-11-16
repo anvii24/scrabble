@@ -34,9 +34,6 @@ class Rack:
             new_tiles = bag.draw(needed)
             self.add(new_tiles)
 
-    def letters(self) -> str:
-        return "".join(tile.letter for tile in self.tiles)
-
     def value(self) -> int:
         total = 0
 

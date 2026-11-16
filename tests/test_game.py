@@ -5,7 +5,7 @@ import pytest
 from scrabble.constants import RACK_SIZE
 from scrabble.game import SCORELESS_TURN_LIMIT, apply_move, is_over, new_game, play_game
 from scrabble.lexicon import Lexicon
-from scrabble.players import GreedyPlayer, RandomPlayer
+from scrabble.players import GreedyPlayer
 from scrabble.types import Move, Placement, Tile
 
 
@@ -17,7 +17,7 @@ def lexicon() -> Lexicon:
 
 
 def test_new_game_deals_full_racks():
-    state = new_game(seed=0, n_players=2)
+    state = new_game(seed=0)
     assert len(state.racks) == 2
     for rack in state.racks:
         assert len(rack.tiles) == RACK_SIZE
@@ -28,19 +28,14 @@ def test_new_game_deals_full_racks():
 
 
 def test_new_game_is_seeded():
-    a = new_game(seed=42, n_players=2)
-    b = new_game(seed=42, n_players=2)
+    a = new_game(seed=42)
+    b = new_game(seed=42)
     assert [t.letter for t in a.racks[0].tiles] == [t.letter for t in b.racks[0].tiles]
     assert [t.letter for t in a.racks[1].tiles] == [t.letter for t in b.racks[1].tiles]
 
 
-def test_new_game_too_few_players_raises():
-    with pytest.raises(ValueError):
-        new_game(seed=0, n_players=1)
-
-
 def test_apply_play_updates_everything():
-    state = new_game(seed=1, n_players=2)
+    state = new_game(seed=1)
     rack = state.racks[0]
     tile = rack.tiles[0]
     move = Move(
@@ -64,7 +59,7 @@ def test_apply_play_updates_everything():
 
 
 def test_apply_play_handles_blank_tiles():
-    state = new_game(seed=1, n_players=2)
+    state = new_game(seed=1)
     rack = state.racks[0]
     blank = next((t for t in rack.tiles if t.is_blank), None)
     if blank is None:
@@ -81,7 +76,7 @@ def test_apply_play_handles_blank_tiles():
 
 
 def test_apply_exchange_counts_as_pass():
-    state = new_game(seed=2, n_players=2)
+    state = new_game(seed=2)
     rack = state.racks[0]
     exchanged = rack.tiles[:2]
     bag_before = state.bag.remaining()
@@ -97,7 +92,7 @@ def test_apply_exchange_counts_as_pass():
 
 
 def test_apply_exchange_with_low_bag_raises():
-    state = new_game(seed=3, n_players=2)
+    state = new_game(seed=3)
     state.bag.draw(state.bag.remaining() - 1)
     move = Move(kind="exchange", exchanged=state.racks[0].tiles[:2])
 
@@ -106,14 +101,14 @@ def test_apply_exchange_with_low_bag_raises():
 
 
 def test_apply_pass_increments_passes():
-    state = new_game(seed=4, n_players=2)
+    state = new_game(seed=4)
     apply_move(state, Move(kind="pass"))
     assert state.passes == 1
     assert state.turn == 1
 
 
 def test_apply_rejects_tiles_not_held():
-    state = new_game(seed=5, n_players=2)
+    state = new_game(seed=5)
     foreign_tile = Tile("Q", 10, False)
     while foreign_tile in state.racks[0].tiles:
         foreign_tile = Tile("Q", 10, False)
@@ -124,21 +119,21 @@ def test_apply_rejects_tiles_not_held():
 
 
 def test_is_over_bag_and_rack_empty():
-    state = new_game(seed=6, n_players=2)
+    state = new_game(seed=6)
     state.bag.draw(state.bag.remaining())
     state.racks[0].tiles.clear()
     assert is_over(state) is True
 
 
 def test_is_over_not_when_only_bag_empty():
-    state = new_game(seed=6, n_players=2)
+    state = new_game(seed=6)
     state.bag.draw(state.bag.remaining())
     assert all(len(r.tiles) > 0 for r in state.racks)
     assert is_over(state) is False
 
 
 def test_is_over_six_passes():
-    state = new_game(seed=7, n_players=2)
+    state = new_game(seed=7)
     for _ in range(SCORELESS_TURN_LIMIT - 1):
         apply_move(state, Move(kind="pass"))
     assert is_over(state) is False
@@ -185,8 +180,8 @@ def test_play_game_rejects_illegal_move(lexicon):
         play_game(p1, p2, seed=0, lexicon=lexicon)
 
 
-def test_full_greedy_vs_random_game_completes(lexicon):
-    p1 = GreedyPlayer(lexicon, "Greedy")
-    p2 = RandomPlayer(lexicon, seed=1, name="Random")
+def test_full_greedy_vs_greedy_game_completes(lexicon):
+    p1 = GreedyPlayer(lexicon, "G1")
+    p2 = GreedyPlayer(lexicon, "G2")
     result = play_game(p1, p2, seed=11, lexicon=lexicon)
     assert result["turns"] > 0
