@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from scrabble.types import Placement, Tile
-from scrabble.constants import SIZE, PREMIUM
+from scrabble.constants import SIZE
 
 
 class Board:
@@ -46,28 +46,3 @@ class Board:
                 new_board.grid[r][c] = self.grid[r][c]
 
         return new_board
-
-    def __str__(self) -> str:
-        result = "    "
-
-        for c in range(SIZE):
-            result += f"{c:>3}"
-
-        result += "\n"
-
-        for r in range(SIZE):
-            result += f"{r:>3} "
-
-            for c in range(SIZE):
-                tile = self.grid[r][c]
-
-                if tile is not None:
-                    cell = tile.letter
-                else:
-                    cell = PREMIUM.get((r, c), ".")
-
-                result += f"{cell:>3}"
-
-            result += "\n"
-
-        return result

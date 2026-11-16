@@ -25,7 +25,7 @@ def _rack(letters: str, blanks: int = 0) -> Rack:
 
 
 def test_show_hides_opponent_rack(capsys):
-    state = new_game(seed=0, n_players=2)
+    state = new_game(seed=0)
     show(state, 0)
     captured = capsys.readouterr().out
 
@@ -134,7 +134,7 @@ def test_parse_malformed_raises():
 
 
 def test_human_reprompts_after_bad_input(monkeypatch, capsys, lexicon):
-    state = new_game(seed=0, n_players=2)
+    state = new_game(seed=0)
     rack = state.racks[0]
     rack.tiles = _rack("AEI").tiles
     inputs = iter(["gibberish nonsense", "pass"])
@@ -149,7 +149,7 @@ def test_human_reprompts_after_bad_input(monkeypatch, capsys, lexicon):
 
 
 def test_human_fills_in_score_and_words(monkeypatch, lexicon):
-    state = new_game(seed=0, n_players=2)
+    state = new_game(seed=0)
     rack = state.racks[0]
     rack.tiles = _rack("CAT", blanks=0).tiles
     inputs = iter(["H8 across CAT"])
