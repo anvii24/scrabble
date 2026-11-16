@@ -22,17 +22,6 @@ WORD_LIST_PATH = Path(__file__).resolve().parent / "data" / "enable1.txt"
 DEFAULT_WEIGHTS = [1.0, 0.0, 0.4713, -0.2761, 0.3178, 1.0254]
 
 
-def _load_weights(path_text: str) -> list[float]:
-    text = Path(path_text).read_text(encoding="utf-8")
-    parts = text.replace(",", " ").split()
-    weights = [float(p) for p in parts]
-
-    if len(weights) != 6:
-        raise ValueError("a weights file must contain exactly six numbers")
-
-    return weights
-
-
 def choose_opponent(lexicon: Lexicon) -> Player:
     while True:
         print("Choose your opponent:")
@@ -44,27 +33,14 @@ def choose_opponent(lexicon: Lexicon) -> Player:
             return GreedyPlayer(lexicon, "Greedy")
 
         if choice == "2":
-            path_text = input(
-                "Path to a weights file (leave blank for default weights): "
-            ).strip()
-
-            weights = DEFAULT_WEIGHTS
-
-            if path_text:
-                try:
-                    weights = _load_weights(path_text)
-                except (OSError, ValueError) as exc:
-                    print(f"Could not load weights ({exc}); using default weights.")
-                    weights = DEFAULT_WEIGHTS
-
-            return WeightedPlayer(weights, lexicon, "Weighted")
+            return WeightedPlayer(DEFAULT_WEIGHTS, lexicon, "Weighted")
 
         print("Please enter 1 or 2.")
 
 
 def _play(human: Player, ai: Player, lexicon: Lexicon) -> None:
     seed = random.randint(0, 2**31 - 1)
-    state = new_game(seed, n_players=2)
+    state = new_game(seed)
     players = [human, ai]
     human_idx = 0
 
