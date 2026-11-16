@@ -1,5 +1,16 @@
 # Scrabble AI
 
+## Team
+
+| Name | Roll number |
+| --- | --- |
+| Anvi Gupta | ________ |
+| Antara Shyam | ________ |
+| Tanisha Agrawal | ________ |
+| Pranav Gupta | ________ |
+| Vishnu Sriram | ________ |
+| Saksham Dhawan | ________ |
+
 A two-player Scrabble game in Python. The AI picks its move with a weighted
 evaluation function over six features (move score, rack leave, vowel balance,
 triple-word squares opened, double-word squares opened, tiles left in the bag).
